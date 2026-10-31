@@ -11,3 +11,4 @@ Run locally:
     venv/bin/python application.py      # http://localhost:5000
 
 See SETUP_LOCAL.md to run it on your own computer, and DEPLOY.md for the step-by-step EC2 and Elastic Beanstalk deployment.
+"Jenkins pipeline test" 
