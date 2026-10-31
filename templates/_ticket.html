@@ -1,0 +1,19 @@
+{% set band = 'ready' if r.percent == 100 else ('close' if r.percent >= 50 else 'far') %}
+<article class="ticket ticket-{{ band }}">
+  <a href="{{ url_for('recipe_detail', recipe_id=r.id) }}" class="ticket-body">
+    <header class="ticket-head">
+      <span>{{ r.cuisine }}</span><span>{{ r.prep_minutes }} min</span>
+    </header>
+    <h3 class="ticket-title">{{ r.title }}</h3>
+    <p class="stamp" aria-label="{{ r.percent }} percent of ingredients in your fridge">{{ r.percent }}<small>%</small></p>
+    <ul class="ticket-lines">
+      {% for i in r.have_list %}<li class="have">{{ i }}</li>{% endfor %}
+      {% for i in r.missing_list %}<li class="miss">{{ i }}</li>{% endfor %}
+    </ul>
+  </a>
+  {% if r.missing_list and show_add is not defined %}
+  <form method="post" action="{{ url_for('add_missing', recipe_id=r.id) }}" class="ticket-foot">
+    <button class="linkbtn">Add {{ r.missing_list|length }} missing to shopping list</button>
+  </form>
+  {% endif %}
+</article>

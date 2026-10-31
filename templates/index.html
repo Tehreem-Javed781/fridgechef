@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Cook with what you have{% endblock %}
+{% block bodyclass %}landing{% endblock %}
+{% block guest %}
+<section class="hero">
+  <div class="hero-copy">
+    <h1>Open the fridge.<br>Dinner's already on order.</h1>
+    <p class="hero-lead">Tell FridgeChef what you've got. It checks {{ recipe_count }} recipes against your shelves and shows how close you are to each one, so you know what to cook before you start chopping.</p>
+    <div class="hero-actions">
+      <a href="{{ url_for('register') }}" class="btn btn-turmeric btn-lg">Create a free account</a>
+      <a href="{{ url_for('login') }}" class="btn btn-quiet btn-lg">Log in</a>
+    </div>
+  </div>
+  <div class="rail rail-hero" aria-label="Example matches">
+    <div class="rail-bar"></div>
+    <div class="rail-tickets">
+      {% for t in [("Masala Omelette","Pakistani",10,100,["egg","onion","tomato","green chilli"],[]),
+                   ("Egg Fried Rice","Chinese",15,71,["rice","egg","peas","oil"],["soy sauce","carrot"]),
+                   ("Chicken Karahi","Pakistani",40,44,["tomato","green chilli","oil"],["chicken","ginger","garlic"])] %}
+      {% set band = 'ready' if t[3] == 100 else ('close' if t[3] >= 50 else 'far') %}
+      <article class="ticket ticket-{{ band }} drop" style="--i:{{ loop.index0 }}">
+        <div class="ticket-body">
+          <header class="ticket-head"><span>{{ t[1] }}</span><span>{{ t[2] }} min</span></header>
+          <h3 class="ticket-title">{{ t[0] }}</h3>
+          <p class="stamp">{{ t[3] }}<small>%</small></p>
+          <ul class="ticket-lines">{% for i in t[4] %}<li class="have">{{ i }}</li>{% endfor %}{% for i in t[5] %}<li class="miss">{{ i }}</li>{% endfor %}</ul>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+<section class="how">
+  <h2>Three steps from shelf to stove</h2>
+  <ol class="how-steps">
+    <li><h3>Stock your fridge</h3><p>Add what you have, with quantities and expiry dates. FridgeChef flags anything that needs using up soon.</p></li>
+    <li><h3>Read your tickets</h3><p>Every recipe gets a ticket showing the share of ingredients you already own and exactly what's missing.</p></li>
+    <li><h3>Shop the gaps</h3><p>Send missing ingredients to your shopping list in one tap, then move them into the fridge once bought.</p></li>
+  </ol>
+</section>
+<footer class="guest-foot">FridgeChef, a kitchen companion by Tehreem Javed</footer>
+{% endblock %}

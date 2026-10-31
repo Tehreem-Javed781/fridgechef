@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Recipes{% endblock %}
+{% block content %}
+<header class="pagehead">
+  <div><h1>Recipes</h1><p class="quiet">{{ recipes|length }} recipe{{ '' if recipes|length == 1 else 's' }}</p></div>
+  <a href="{{ url_for('recipe_new') }}" class="btn btn-turmeric">Publish a recipe</a>
+</header>
+<form method="get" class="filters" id="recipe-filters">
+  <input name="q" value="{{ q }}" placeholder="Search titles or ingredients" class="grow" aria-label="Search recipes">
+  <select name="cuisine" aria-label="Cuisine"><option value="">All cuisines</option>{% for c in cuisines %}<option {{ 'selected' if c == cuisine }}>{{ c }}</option>{% endfor %}</select>
+  <select name="difficulty" aria-label="Difficulty"><option value="">Any level</option>{% for d in difficulties %}<option {{ 'selected' if d == difficulty }}>{{ d }}</option>{% endfor %}</select>
+  <label class="check"><input type="checkbox" name="mine" value="1" {{ 'checked' if mine }}> Only mine</label>
+  <button class="btn btn-quiet btn-sm" type="submit">Apply</button>
+</form>
+{% if recipes %}
+<div class="rgrid">{% for r in recipes %}{% include "_recipe_card.html" %}{% endfor %}</div>
+{% else %}<div class="empty"><p>No recipes match those filters. Clear them, or publish the first one.</p></div>{% endif %}
+{% endblock %}

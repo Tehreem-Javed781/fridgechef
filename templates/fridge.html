@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}My fridge{% endblock %}
+{% block content %}
+<header class="pagehead">
+  <div><h1>My fridge</h1>
+  <p class="quiet">{{ items|length }} item{{ '' if items|length == 1 else 's' }}{% if q or category %} match your filter{% endif %}</p></div>
+  <a href="{{ url_for('match') }}" class="btn btn-quiet">What can I cook?</a>
+</header>
+
+<form method="post" action="{{ url_for('fridge_add') }}" class="addbar" id="add-item-form">
+  <label class="grow">Ingredient<input name="name" placeholder="tomato" required></label>
+  <label class="w-qty">Qty<input name="quantity" type="number" step="0.01" min="0.01" value="1"></label>
+  <label>Unit<select name="unit">{% for u in units %}<option>{{ u }}</option>{% endfor %}</select></label>
+  <label>Category<select name="category">{% for c in categories %}<option>{{ c }}</option>{% endfor %}</select></label>
+  <label><span>Use by <span class="opt">optional</span></span><input name="expiry_date" type="date"></label>
+  <button class="btn btn-turmeric" type="submit">Add to fridge</button>
+</form>
+
+<form method="get" class="filters">
+  <input name="q" value="{{ q }}" placeholder="Search your fridge" aria-label="Search your fridge">
+  <select name="category" aria-label="Category"><option value="">All categories</option>{% for c in categories %}<option {{ 'selected' if c == category }}>{{ c }}</option>{% endfor %}</select>
+  <button class="btn btn-quiet btn-sm" type="submit">Filter</button>
+  {% if q or category %}<a href="{{ url_for('fridge') }}">Clear filter</a>{% endif %}
+</form>
+
+{% if items %}
+<div class="tablewrap">
+<table class="table">
+  <thead><tr><th>Ingredient</th><th>Amount</th><th>Category</th><th>Use by</th><th><span class="sr">Actions</span></th></tr></thead>
+  <tbody>
+  {% for i in items %}
+    {% set state = 'gone' if i.expiry_date and i.expiry_date < today else ('soon' if i.expiry_date and i.expiry_date <= soon else '') %}
+    <tr class="{{ state }}">
+      <td class="strong">{{ i.name|capitalize }}</td>
+      <td>{{ '%g'|format(i.quantity|float) }} {{ i.unit }}</td>
+      <td><span class="cat cat-{{ i.category|lower|replace(' & ','-')|replace(' ','-') }}">{{ i.category }}</span></td>
+      <td>{% if i.expiry_date %}{{ i.expiry_date.strftime('%d %b %Y') }}{% if state == 'gone' %} <span class="tag tag-chilli">Expired</span>{% elif state == 'soon' %} <span class="tag tag-turmeric">Soon</span>{% endif %}{% else %}<span class="quiet">Not set</span>{% endif %}</td>
+      <td class="rowacts">
+        <a href="{{ url_for('fridge_edit', item_id=i.id) }}" class="btn btn-quiet btn-sm">Edit</a>
+        <form method="post" action="{{ url_for('fridge_delete', item_id=i.id) }}" onsubmit="return confirm('Remove {{ i.name }} from your fridge?')"><button class="btn btn-danger btn-sm">Remove</button></form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<div class="empty"><p>{% if q or category %}Nothing in your fridge matches that filter.{% else %}Your fridge is empty. Add your first ingredient above.{% endif %}</p></div>
+{% endif %}
+{% endblock %}

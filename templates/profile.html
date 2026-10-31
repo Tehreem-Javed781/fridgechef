@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Your account{% endblock %}
+{% block content %}
+<header class="pagehead"><h1>Your account</h1></header>
+<div class="recipe-cols">
+  <section class="panel">
+    <form method="post" class="form" id="profile-form">
+      <label>Name<input name="name" value="{{ current_user.name }}" required></label>
+      <label>Email<input value="{{ current_user.email }}" disabled></label>
+      <h2>Change password <span class="opt">optional</span></h2>
+      <div class="cols-2">
+        <label>Current password<input type="password" name="current_password" autocomplete="current-password"></label>
+        <label>New password<input type="password" name="new_password" minlength="6" autocomplete="new-password"></label>
+      </div>
+      <div class="btnrow"><button class="btn btn-ink" type="submit">Save changes</button></div>
+    </form>
+  </section>
+  <section class="panel">
+    <h2>Your kitchen</h2>
+    <dl class="ledger">
+      <div><dt>Items in fridge</dt><dd>{{ stats.pantry }}</dd></div>
+      <div><dt>Recipes published</dt><dd>{{ stats.recipes }}</dd></div>
+      <div><dt>Recipes saved</dt><dd>{{ stats.favorites }}</dd></div>
+      <div><dt>Member since</dt><dd>{{ current_user.created_at.strftime('%d %b %Y') }}</dd></div>
+    </dl>
+  </section>
+</div>
+{% endblock %}

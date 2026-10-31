@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}FridgeChef{% endblock %} | FridgeChef</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}">
+</head>
+<body class="{{ 'is-app' if current_user else 'is-guest' }} {% block bodyclass %}{% endblock %}">
+{% set ep = request.endpoint or '' %}
+{% if current_user %}
+  <input type="checkbox" id="passtoggle" class="passtoggle" aria-hidden="true">
+  <aside class="pass" aria-label="Main navigation">
+    <div class="pass-top">
+      <a class="wordmark" href="{{ url_for('dashboard') }}">FridgeChef</a>
+      <label for="passtoggle" class="pass-burger" aria-label="Toggle menu">Menu</label>
+    </div>
+    <nav class="pass-nav">
+      <a href="{{ url_for('dashboard') }}" class="{{ 'on' if ep == 'dashboard' }}">Today</a>
+      <a href="{{ url_for('fridge') }}" class="{{ 'on' if ep.startswith('fridge') }}">My fridge</a>
+      <a href="{{ url_for('match') }}" class="{{ 'on' if ep == 'match' }}">What can I cook</a>
+      <a href="{{ url_for('recipes') }}" class="{{ 'on' if ep.startswith('recipe') or ep in ('toggle_favorite','add_missing') }}">Recipes</a>
+      <a href="{{ url_for('favorites') }}" class="{{ 'on' if ep == 'favorites' }}">Saved</a>
+      <a href="{{ url_for('shopping') }}" class="{{ 'on' if ep.startswith('shopping') }}">Shopping list</a>
+    </nav>
+    <div class="pass-foot">
+      <a href="{{ url_for('profile') }}" class="pass-user {{ 'on' if ep == 'profile' }}">
+        <span class="avatar">{{ current_user.name[:1]|upper }}</span><span>{{ current_user.name }}</span>
+      </a>
+      <a href="{{ url_for('logout') }}" class="pass-logout">Log out</a>
+    </div>
+  </aside>
+  <main class="work">
+    {% include "_flashes.html" %}
+    {% block content %}{% endblock %}
+  </main>
+{% else %}
+  <header class="guestbar">
+    <a class="wordmark" href="{{ url_for('index') }}">FridgeChef</a>
+    <nav>
+      <a href="{{ url_for('login') }}" class="{{ 'on' if ep == 'login' }}">Log in</a>
+      <a href="{{ url_for('register') }}" class="btn btn-turmeric btn-sm">Create account</a>
+    </nav>
+  </header>
+  <main class="guest-main">
+    {% include "_flashes.html" %}
+    {% block guest %}{{ self.content() }}{% endblock %}
+  </main>
+{% endif %}
+</body>
+</html>

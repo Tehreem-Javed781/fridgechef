@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Publish a recipe' if mode == 'new' else 'Edit recipe' }}{% endblock %}
+{% block content %}
+<a href="{{ url_for('recipe_detail', recipe_id=recipe.id) if recipe else url_for('recipes') }}" class="back">{{ 'Back to recipe' if recipe else 'Back to recipes' }}</a>
+<header class="pagehead"><h1>{{ 'Publish a recipe' if mode == 'new' else 'Edit ' ~ recipe.title }}</h1></header>
+<form method="post" class="panel form" id="recipe-form">
+  <label>Title<input name="title" value="{{ data.title or '' }}" required minlength="3"></label>
+  <label><span>Short description <span class="opt">optional</span></span><input name="description" value="{{ data.description or '' }}"></label>
+  <div class="cols-4">
+    <label>Cuisine<input name="cuisine" value="{{ data.cuisine or '' }}" placeholder="Pakistani" list="cuisines"></label>
+    <datalist id="cuisines"><option>Pakistani</option><option>Chinese</option><option>Italian</option><option>Continental</option></datalist>
+    <label>Time in minutes<input name="prep_minutes" type="number" min="1" value="{{ data.prep_minutes or 15 }}"></label>
+    <label>Serves<input name="servings" type="number" min="1" value="{{ data.servings or 2 }}"></label>
+    <label>Level<select name="difficulty">{% for d in difficulties %}<option {{ 'selected' if d == data.difficulty }}>{{ d }}</option>{% endfor %}</select></label>
+  </div>
+  <div class="cols-2">
+    <label><span>Ingredients <span class="opt">one per line, as name : quantity</span></span>
+      <textarea name="ingredients" rows="10" placeholder="rice : 2 cups&#10;egg : 2&#10;soy sauce : 2 tbsp" required>{{ data.ingredients_text or '' }}</textarea></label>
+    <label><span>Method <span class="opt">one step per line</span></span>
+      <textarea name="instructions" rows="10" required>{{ data.instructions or '' }}</textarea></label>
+  </div>
+  <div class="btnrow"><button class="btn btn-ink" type="submit">{{ 'Publish recipe' if mode == 'new' else 'Save changes' }}</button>
+    <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) if recipe else url_for('recipes') }}" class="btn btn-quiet">Cancel</a></div>
+</form>
+{% endblock %}

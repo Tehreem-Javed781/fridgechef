@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Shopping list{% endblock %}
+{% block content %}
+{% set todo = items|rejectattr('is_bought')|list %}
+<header class="pagehead">
+  <div><h1>Shopping list</h1><p class="quiet">{{ todo|length }} still to buy</p></div>
+  {% if items|selectattr('is_bought')|list %}<form method="post" action="{{ url_for('shopping_clear') }}"><button class="btn btn-quiet btn-sm">Clear bought items</button></form>{% endif %}
+</header>
+<form method="post" action="{{ url_for('shopping_add') }}" class="addbar" id="shopping-form">
+  <label class="grow">Item<input name="name" placeholder="milk" required></label>
+  <label class="w-qty2"><span>Quantity <span class="opt">optional</span></span><input name="quantity" placeholder="1 L"></label>
+  <button class="btn btn-turmeric">Add to list</button>
+</form>
+{% if items %}
+<ul class="receipt">
+  {% for i in items %}
+  <li class="{{ 'bought' if i.is_bought }}">
+    <form method="post" action="{{ url_for('shopping_toggle', item_id=i.id) }}"><button class="tick" aria-label="{{ 'Mark as not bought' if i.is_bought else 'Mark as bought' }}" aria-pressed="{{ 'true' if i.is_bought else 'false' }}"></button></form>
+    <span class="receipt-name">{{ i.name|capitalize }}</span>
+    <span class="receipt-qty">{{ i.quantity }}</span>
+    <form method="post" action="{{ url_for('shopping_to_fridge', item_id=i.id) }}"><button class="linkbtn">Move to fridge</button></form>
+    <form method="post" action="{{ url_for('shopping_delete', item_id=i.id) }}"><button class="linkbtn linkbtn-danger">Delete</button></form>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}<div class="empty"><p>Your list is empty. Missing ingredients from any recipe can be added here in one tap.</p></div>{% endif %}
+{% endblock %}

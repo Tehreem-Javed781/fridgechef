@@ -1,0 +1,53 @@
+# Part II - used by the Jenkins pipeline.
+# Differences from Part I: the code is mounted as a volume (no Dockerfile / no
+# custom image), and different host ports + container names are used.
+name: fridgechef-ci
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: fridgechef-ci-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: fridgechef
+      MYSQL_USER: fridgechef
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3308:3306"            # host 3308 -> container 3306
+    volumes:
+      - fridgechef-ci-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  web:
+    image: python:3.12-slim             # stock image, no Dockerfile
+    container_name: fridgechef-ci-web
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ./:/app                         # code volume: the Jenkins workspace (fresh from GitHub)
+    command: >
+      sh -c "pip install --no-cache-dir -r requirements.txt &&
+             gunicorn --bind 0.0.0.0:8000 --workers 2 --timeout 60 application:application"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"      # don't write root-owned __pycache__ into the workspace
+      PYTHONUNBUFFERED: "1"
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_NAME: fridgechef
+      DB_USER: fridgechef
+      DB_PASSWORD: ${DB_PASSWORD}
+      SECRET_KEY: ${SECRET_KEY}
+    ports:
+      - "8081:8000"            # host 8081 -> container 8000 (8080 is Jenkins)
+
+volumes:
+  fridgechef-ci-db-data:

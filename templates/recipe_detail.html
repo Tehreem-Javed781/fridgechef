@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ recipe.title }}{% endblock %}
+{% block content %}
+<a href="{{ url_for('recipes') }}" class="back">Back to recipes</a>
+<header class="recipehead">
+  <div>
+    <span class="rcard-cuisine">{{ recipe.cuisine }}</span>
+    <h1>{{ recipe.title }}</h1>
+    {% if recipe.description %}<p class="hero-lead dark">{{ recipe.description }}</p>{% endif %}
+    <dl class="facts facts-lg">
+      <div><dt>Time</dt><dd>{{ recipe.prep_minutes }} min</dd></div>
+      <div><dt>Serves</dt><dd>{{ recipe.servings }}</dd></div>
+      <div><dt>Level</dt><dd class="lvl lvl-{{ recipe.difficulty|lower }}">{{ recipe.difficulty }}</dd></div>
+      <div><dt>By</dt><dd>{{ recipe.author or 'FridgeChef kitchen' }}</dd></div>
+    </dl>
+  </div>
+  <div class="btnrow">
+    <form method="post" action="{{ url_for('toggle_favorite', recipe_id=recipe.id) }}"><button class="btn {{ 'btn-saved' if is_fav else 'btn-quiet' }}" id="fav-btn" aria-pressed="{{ 'true' if is_fav else 'false' }}">{{ 'Saved' if is_fav else 'Save recipe' }}</button></form>
+    {% if recipe.user_id == current_user.id %}
+      <a href="{{ url_for('recipe_edit', recipe_id=recipe.id) }}" class="btn btn-quiet">Edit</a>
+      <form method="post" action="{{ url_for('recipe_delete', recipe_id=recipe.id) }}" onsubmit="return confirm('Delete this recipe for good?')"><button class="btn btn-danger">Delete</button></form>
+    {% endif %}
+  </div>
+</header>
+<div class="recipe-cols">
+  <section class="panel">
+    <h2>Ingredients</h2>
+    <p class="quiet">{{ ingredients|length - missing|length }} of {{ ingredients|length }} are in your fridge</p>
+    <ul class="inglist">
+      {% for i in ingredients %}<li class="{{ 'have' if i.have else 'miss' }}"><span>{{ i.name|capitalize }}</span><span class="qty">{{ i.quantity }}</span></li>{% endfor %}
+    </ul>
+    {% if missing %}
+    <form method="post" action="{{ url_for('add_missing', recipe_id=recipe.id) }}"><button class="btn btn-turmeric btn-block" id="add-missing-btn">Add {{ missing|length }} missing to shopping list</button></form>
+    {% else %}<p class="allset">Everything's in your fridge. You can start cooking.</p>{% endif %}
+  </section>
+  <section class="panel">
+    <h2>Method</h2>
+    <ol class="steps">{% for s in steps %}<li>{{ s }}</li>{% endfor %}</ol>
+  </section>
+</div>
+{% endblock %}

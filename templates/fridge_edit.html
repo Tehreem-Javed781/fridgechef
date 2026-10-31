@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Edit {{ item.name }}{% endblock %}
+{% block content %}
+<a href="{{ url_for('fridge') }}" class="back">Back to my fridge</a>
+<div class="panel narrow">
+  <h1>Edit {{ item.name }}</h1>
+  <form method="post" class="form" id="edit-item-form">
+    <label>Ingredient<input name="name" value="{{ item.name }}" required></label>
+    <div class="cols-2">
+      <label>Quantity<input name="quantity" type="number" step="0.01" min="0.01" value="{{ '%g'|format(item.quantity|float) }}"></label>
+      <label>Unit<select name="unit">{% for u in units %}<option {{ 'selected' if u == item.unit }}>{{ u }}</option>{% endfor %}</select></label>
+    </div>
+    <label>Category<select name="category">{% for c in categories %}<option {{ 'selected' if c == item.category }}>{{ c }}</option>{% endfor %}</select></label>
+    <label>Use by<input name="expiry_date" type="date" value="{{ item.expiry_date or '' }}"></label>
+    <div class="btnrow"><button class="btn btn-ink" type="submit">Save changes</button><a href="{{ url_for('fridge') }}" class="btn btn-quiet">Cancel</a></div>
+  </form>
+</div>
+{% endblock %}

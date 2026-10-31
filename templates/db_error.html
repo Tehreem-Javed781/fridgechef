@@ -1,0 +1,5 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Database unavailable | FridgeChef</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
+<body class="is-guest"><main class="guest-main"><div class="authbox"><h1>FridgeChef can't reach its database</h1>
+<p class="sub">Check DB_HOST, DB_USER, DB_PASSWORD and DB_NAME in your .env file (or Beanstalk environment properties), and that MySQL is running and reachable on port 3306.</p>
+<pre class="errbox">{{ error }}</pre></div></main></body></html>

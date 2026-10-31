@@ -1,0 +1,11 @@
+# secrets - never commit
+.env
+
+# local Python stuff
+venv/
+__pycache__/
+*.pyc
+
+# old Elastic Beanstalk bundle (not used in Assignment 2)
+fridgechef-eb/
+*.zip

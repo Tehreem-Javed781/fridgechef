@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Today{% endblock %}
+{% block content %}
+<header class="pagehead">
+  <div>
+    <p class="date">{{ today.strftime('%A %d %B') }}</p>
+    <h1>Hi {{ current_user.name.split()[0] }}, here's what's cooking</h1>
+  </div>
+  <a href="{{ url_for('match') }}" class="btn btn-ink">See every match</a>
+</header>
+
+<section class="counts" aria-label="Your kitchen at a glance">
+  <a href="{{ url_for('fridge') }}"><b>{{ stats.pantry }}</b><span>in your fridge</span></a>
+  <a href="{{ url_for('fridge') }}" class="{{ 'alert' if stats.expiring }}"><b>{{ stats.expiring }}</b><span>to use within 3 days</span></a>
+  <a href="{{ url_for('favorites') }}"><b>{{ stats.favorites }}</b><span>saved recipes</span></a>
+  <a href="{{ url_for('shopping') }}"><b>{{ stats.shopping }}</b><span>on your shopping list</span></a>
+</section>
+
+<section class="block">
+  <h2>Your best tickets right now</h2>
+  {% if matches %}
+  <div class="rail"><div class="rail-bar"></div>
+    <div class="rail-tickets">{% for r in matches %}{% include "_ticket.html" %}{% endfor %}</div>
+  </div>
+  {% else %}
+  <div class="empty"><p>Your tickets appear once there's something in your fridge.</p><a class="btn btn-ink btn-sm" href="{{ url_for('fridge') }}">Add ingredients</a></div>
+  {% endif %}
+</section>
+
+<section class="block">
+  <h2>Use these soon</h2>
+  {% if expiring %}
+  <ul class="shelf">
+    {% for i in expiring %}
+    {% set gone = i.expiry_date < today %}
+    <li class="{{ 'gone' if gone else 'soon' }}"><span class="shelf-name">{{ i.name|capitalize }}</span>
+      <span class="tag {{ 'tag-chilli' if gone else 'tag-turmeric' }}">{{ 'Expired ' ~ i.expiry_date.strftime('%d %b') if gone else 'Use by ' ~ i.expiry_date.strftime('%d %b') }}</span></li>
+    {% endfor %}
+  </ul>
+  {% else %}<p class="quiet">Nothing in your fridge expires in the next three days.</p>{% endif %}
+</section>
+{% endblock %}

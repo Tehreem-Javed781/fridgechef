@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}What can I cook{% endblock %}
+{% block content %}
+<header class="pagehead">
+  <div>
+    <h1>What can I cook?</h1>
+    <p class="quiet">Every recipe checked against the {{ pantry_count }} item{{ '' if pantry_count == 1 else 's' }} in your fridge. Salt, oil, sugar, pepper and water count as always in stock.</p>
+  </div>
+  <form method="get" class="inline-filter">
+    <label for="min">Hide recipes below</label>
+    <select name="min" id="min" onchange="this.form.submit()">{% for v in [0,25,50,75,100] %}<option value="{{ v }}" {{ 'selected' if v == min_pct }}>{{ v }}%</option>{% endfor %}</select>
+    <noscript><button class="btn btn-sm">Apply</button></noscript>
+  </form>
+</header>
+{% if pantry_count == 0 %}<p class="flash flash-warning">Your fridge is empty, so every ticket is low. <a href="{{ url_for('fridge') }}">Add ingredients</a> to see real matches.</p>{% endif %}
+
+{% set groups = [
+  ("Ready to cook", "You have every ingredient.", results|selectattr('percent','equalto',100)|list),
+  ("Nearly there", "Half or more of the ingredients are in your fridge.", results|selectattr('percent','lt',100)|selectattr('percent','ge',50)|list),
+  ("Needs a shop", "You're missing most of the ingredients.", results|selectattr('percent','lt',50)|list)] %}
+{% for title, note, items in groups if items %}
+<section class="block">
+  <h2>{{ title }} <span class="count">{{ items|length }}</span></h2>
+  <p class="quiet">{{ note }}</p>
+  <div class="rail"><div class="rail-bar"></div>
+    <div class="rail-tickets">{% for r in items %}{% include "_ticket.html" %}{% endfor %}</div>
+  </div>
+</section>
+{% else %}
+<div class="empty"><p>No recipes reach {{ min_pct }}% yet. Lower the threshold or add more ingredients.</p></div>
+{% endfor %}
+{% endblock %}

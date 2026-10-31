@@ -1,0 +1,10 @@
+<a class="rcard" href="{{ url_for('recipe_detail', recipe_id=r.id) }}">
+  <span class="rcard-cuisine">{{ r.cuisine }}</span>
+  <h3>{{ r.title }}</h3>
+  <p class="rcard-desc">{{ r.description }}</p>
+  <dl class="facts">
+    <div><dt>Time</dt><dd>{{ r.prep_minutes }} min</dd></div>
+    <div><dt>Serves</dt><dd>{{ r.servings }}</dd></div>
+    <div><dt>Level</dt><dd class="lvl lvl-{{ r.difficulty|lower }}">{{ r.difficulty }}</dd></div>
+  </dl>
+</a>
