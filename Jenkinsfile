@@ -11,7 +11,7 @@ pipeline {
         DB_PASSWORD = credentials('fridgechef-db-password')   // Jenkins "Secret text" credential
         SECRET_KEY  = credentials('fridgechef-secret-key')    // Jenkins "Secret text" credential
         COMPOSE     = 'docker compose -f docker-compose.jenkins.yml'
-        APP_URL     = 'http://YOUR-ELASTIC-IP:8081'                  // <-- change to your Elastic IP
+        APP_URL     = 'http://56.228.108.186:8081'                 // <-- change to your Elastic IP
     }
 
     options {
